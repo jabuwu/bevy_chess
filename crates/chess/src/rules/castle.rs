@@ -26,6 +26,7 @@ impl Castle {
             if planner.is_empty(PositionOffset(1, 0))
                 && planner.is_empty(PositionOffset(2, 0))
                 && planner.is_my_piece(PositionOffset(3, 0), PieceKind::Rook)
+                && !planner.is_under_attack(PositionOffset(0, 0))
             {
                 let rook_position = planner.position().offset(PositionOffset(3, 0)).unwrap();
                 if !self.moved[planner.position().index()] && !self.moved[rook_position.index()] {
@@ -38,6 +39,7 @@ impl Castle {
                 && planner.is_empty(PositionOffset(-2, 0))
                 && planner.is_empty(PositionOffset(-3, 0))
                 && planner.is_my_piece(PositionOffset(-4, 0), PieceKind::Rook)
+                && !planner.is_under_attack(PositionOffset(0, 0))
             {
                 let rook_position = planner.position().offset(PositionOffset(-4, 0)).unwrap();
                 if !self.moved[planner.position().index()] && !self.moved[rook_position.index()] {
@@ -333,6 +335,22 @@ mod tests {
 
         assert!(board.apply_move(board_move!(f8 g8)));
         assert!(board.is_valid_move(board_move!(e1 c1)));
+        assert!(!board.is_valid_move(board_move!(e1 g1)));
+    }
+
+    #[test]
+    fn castle_forbidden_if_check() {
+        let board = board!(
+            _ _ _ _ K _ _ _
+            _ _ _ _ _ _ _ _
+            _ _ _ _ _ _ _ _
+            _ _ _ _ _ _ _ _
+            _ _ _ _ _ _ _ _
+            _ _ _ _ _ _ _ _
+            _ _ N _ _ _ _ _
+            r _ _ _ k _ _ r
+        );
+        assert!(!board.is_valid_move(board_move!(e1 c1)));
         assert!(!board.is_valid_move(board_move!(e1 g1)));
     }
 }
